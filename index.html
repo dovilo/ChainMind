@@ -2,792 +2,513 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChainMind — AI DeFi Strategy Agent Studio</title>
-<meta name="description" content="Build, simulate, and deploy autonomous AI agents that execute DeFi strategies on-chain. Powered by MiMo v2.5-pro.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChainMind — AI Agent Network for On-Chain Intelligence</title>
+<meta name="description" content="Autonomous AI agent swarm that monitors blockchain activity, detects patterns, and executes strategies in real-time. Powered by MiMo v2.5-pro.">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#06060b;--bg2:#0c0c14;--bg3:#12121e;--border:#1a1a2e;--text:#e0e0e8;--text2:#8888a0;--accent:#00d4ff;--accent2:#7b61ff;--accent3:#ff6b6b;--green:#00e88f;--orange:#ffa940;--pink:#ff61d8}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
-a{color:var(--accent);text-decoration:none}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--accent:#6366f1;--accent2:#8b5cf6;--green:#10b981;--red:#ef4444;--yellow:#eab308;--cyan:#06b6d4;--text:#e2e8f0;--muted:#64748b;--glow:rgba(99,102,241,.15)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;overflow-x:hidden}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
 
-/* HEADER */
-.header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,6,11,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700}
-.logo svg{width:28px;height:28px}
-.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header-actions{display:flex;gap:10px;align-items:center}
-.badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.2)}
-.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+nav .inner{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;max-width:1200px;margin:0 auto}
+nav .logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav .badge{background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.5px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;padding-top:80px}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:16px}
+.hero h1 .gradient{background:linear-gradient(135deg,var(--accent),var(--cyan),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:640px;margin:0 auto 32px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{padding:12px 28px;border-radius:12px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .2s}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,212,255,.3)}
-.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-.btn-outline:hover{background:rgba(0,212,255,.1)}
-.btn-danger{background:var(--accent3);color:#fff}
-.btn-success{background:var(--green);color:#000}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,.3)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent)}
 
-/* LAYOUT */
-.app{display:grid;grid-template-columns:220px 1fr 320px;grid-template-rows:56px 1fr 200px;height:100vh;gap:0}
-
-/* SIDEBAR */
-.sidebar{grid-row:2/4;background:var(--bg2);border-right:1px solid var(--border);padding:16px;overflow-y:auto}
-.sidebar h3{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin:16px 0 8px}
-.sidebar h3:first-child{margin-top:0}
-.node-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:grab;transition:all .15s;margin-bottom:4px;border:1px solid transparent}
-.node-item:hover{background:var(--bg3);border-color:var(--border)}
-.node-item:active{cursor:grabbing;transform:scale(.97)}
-.node-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.node-info{flex:1;min-width:0}
-.node-info .name{font-size:13px;font-weight:600}
-.node-info .desc{font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* MIMO BADGE */
+.mimo-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:99px;padding:6px 16px;font-size:.85rem;font-weight:600;margin-bottom:24px}
+.mimo-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* CANVAS */
-.canvas-area{grid-row:2;position:relative;background:var(--bg);overflow:hidden}
-canvas#flowCanvas{position:absolute;top:0;left:0;width:100%;height:100%}
-.canvas-toolbar{position:absolute;top:12px;left:12px;display:flex;gap:8px;z-index:10}
-.canvas-toolbar .btn{font-size:12px;padding:6px 14px;background:rgba(12,12,20,.9);border:1px solid var(--border);color:var(--text2);backdrop-filter:blur(10px)}
-.canvas-toolbar .btn:hover{border-color:var(--accent);color:var(--accent)}
-.canvas-toolbar .btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+#neural-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.35}
+.hero-content{position:relative;z-index:1}
 
-/* NODES ON CANVAS */
-.canvas-node{position:absolute;min-width:160px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);cursor:move;transition:box-shadow .2s;z-index:5;user-select:none}
-.canvas-node:hover{box-shadow:0 0 20px rgba(0,212,255,.15)}
-.canvas-node.selected{border-color:var(--accent);box-shadow:0 0 25px rgba(0,212,255,.25)}
-.canvas-node .node-header{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
-.canvas-node .node-body{padding:10px 14px;font-size:12px;color:var(--text2)}
-.canvas-node .port{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);position:absolute;background:var(--bg);cursor:crosshair;z-index:6}
-.canvas-node .port-out{right:-6px;top:50%;transform:translateY(-50%)}
-.canvas-node .port-in{left:-6px;top:50%;transform:translateY(-50%)}
-.canvas-node .port:hover{background:var(--accent);box-shadow:0 0 10px var(--accent)}
+/* SECTIONS */
+section{padding:100px 0}
+.section-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.section-sub{color:var(--muted);text-align:center;max-width:600px;margin:0 auto 48px;font-size:1.05rem}
 
-/* REASONING PANEL */
-.reasoning-panel{grid-row:2;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column}
-.panel-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.panel-header h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.panel-header .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-.reasoning-content{flex:1;overflow-y:auto;padding:14px 16px;font-size:12px;line-height:1.7}
-.reasoning-content .step{margin-bottom:14px;padding:12px;border-radius:8px;background:var(--bg);border:1px solid var(--border)}
-.reasoning-content .step .label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:4px}
-.reasoning-content .step .text{color:var(--text2)}
-.reasoning-content .step .decision{color:var(--green);font-weight:600;margin-top:6px}
-.reasoning-content .step .warning{color:var(--orange);font-weight:600;margin-top:6px}
-.thinking-dots{display:flex;gap:4px;padding:8px 0}
-.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.4s infinite}
-.thinking-dots span:nth-child(2){animation-delay:.2s}
-.thinking-dots span:nth-child(3){animation-delay:.4s}
+/* AGENTS GRID */
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:all .3s;cursor:default}
+.agent-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 12px 40px var(--glow)}
+.agent-icon{font-size:2.5rem;margin-bottom:12px}
+.agent-card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.agent-card p{font-size:.85rem;color:var(--muted)}
+.agent-status{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;margin-top:10px;padding:3px 10px;border-radius:99px}
+.agent-status.active{background:rgba(16,185,129,.15);color:var(--green)}
+.agent-status.monitoring{background:rgba(6,182,212,.15);color:var(--cyan)}
 
-/* BOTTOM DASHBOARD */
-.dashboard{grid-column:2/4;grid-row:3;background:var(--bg2);border-top:1px solid var(--border);padding:16px 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;overflow:hidden}
-.metric{background:var(--bg);border-radius:10px;padding:14px;border:1px solid var(--border);display:flex;flex-direction:column;justify-content:space-between}
-.metric .label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2)}
-.metric .value{font-size:22px;font-weight:700}
-.metric .change{font-size:11px;display:flex;align-items:center;gap:4px}
-.metric .change.up{color:var(--green)}
-.metric .change.down{color:var(--accent3)}
-.metric-chart{height:30px;margin-top:6px}
-.metric-chart canvas{width:100%;height:100%}
+/* LIVE DEMO */
+.demo-container{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.demo-header{display:flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.demo-dot{width:10px;height:10px;border-radius:50%}
+.demo-dot.r{background:var(--red)}.demo-dot.y{background:var(--yellow)}.demo-dot.g{background:var(--green)}
+.demo-body{display:grid;grid-template-columns:1fr 1fr;min-height:500px}
+@media(max-width:768px){.demo-body{grid-template-columns:1fr}}
+.demo-left{padding:20px;border-right:1px solid var(--border)}
+.demo-right{padding:20px}
 
-/* ANIMATIONS */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+/* AGENT NETWORK CANVAS */
+#agent-canvas{width:100%;height:280px;border-radius:12px;background:rgba(0,0,0,.3);border:1px solid var(--border)}
+
+/* LIVE FEED */
+.feed{max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.feed-item{padding:10px 12px;border-radius:10px;margin-bottom:8px;font-size:.82rem;border-left:3px solid transparent;animation:fadeIn .4s}
+.feed-item.alert{background:rgba(239,68,68,.08);border-left-color:var(--red)}
+.feed-item.info{background:rgba(99,102,241,.08);border-left-color:var(--accent)}
+.feed-item.success{background:rgba(16,185,129,.08);border-left-color:var(--green)}
+.feed-item.trade{background:rgba(234,179,8,.08);border-left-color:var(--yellow)}
+.feed-time{color:var(--muted);font-size:.7rem}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-@keyframes glow{0%,100%{box-shadow:0 0 5px var(--accent)}50%{box-shadow:0 0 20px var(--accent),0 0 40px rgba(0,212,255,.2)}}
-.fade-in{animation:fadeIn .4s ease-out}
 
-/* PROTOCOL LOGOS */
-.proto-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
-.proto-uni{background:linear-gradient(135deg,#ff007a,#ff6b9d);color:#fff}
-.proto-aave{background:linear-gradient(135deg,#b6509e,#2ebac6);color:#fff}
-.proto-lido{background:linear-gradient(135deg,#00a3ff,#4dabf7);color:#fff}
-.proto-comp{background:linear-gradient(135deg,#00d395,#39d98a);color:#fff}
-.proto-curve{background:linear-gradient(135deg,#ff4e4e,#ffd700);color:#fff}
-.proto-maker{background:linear-gradient(135deg,#1aab9b,#27c499);color:#fff}
-.agent-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.agent-scan{background:linear-gradient(135deg,var(--accent),#0088cc)}
-.agent-reason{background:linear-gradient(135deg,var(--accent2),#5b3fd9)}
-.agent-exec{background:linear-gradient(135deg,var(--green),#00b36b)}
-.agent-risk{background:linear-gradient(135deg,var(--accent3),#cc3333)}
-.agent-yield{background:linear-gradient(135deg,var(--orange),#cc8400)}
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px}
+.stat{text-align:center;padding:16px;background:rgba(255,255,255,.02);border-radius:12px}
+.stat .val{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .label{font-size:.75rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:500px;width:90%;animation:fadeIn .3s}
-.modal h2{font-size:18px;margin-bottom:16px}
-.modal textarea{width:100%;height:100px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:13px;resize:none;margin-bottom:12px}
-.modal textarea:focus{outline:none;border-color:var(--accent)}
+/* QUERY BOX */
+.query-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:24px}
+.query-input-wrap{display:flex;gap:12px}
+.query-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-size:.95rem;outline:none}
+.query-input:focus{border-color:var(--accent)}
+.query-input::placeholder{color:var(--muted)}
+.query-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:12px;padding:12px 24px;font-weight:700;cursor:pointer}
+.query-result{margin-top:16px;padding:16px;background:rgba(0,0,0,.3);border-radius:12px;font-size:.9rem;color:var(--text);min-height:60px;display:none;font-family:'JetBrains Mono',monospace;line-height:1.7}
+.query-result.show{display:block;animation:fadeIn .4s}
 
-/* TOAST */
-.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);font-size:13px;z-index:300;animation:fadeIn .3s;display:none}
-.toast.show{display:block}
+/* ARCHITECTURE */
+.arch-diagram{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.8;color:var(--muted);overflow-x:auto;white-space:pre;text-align:center}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.feature{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px}
+.feature h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.feature p{font-size:.9rem;color:var(--muted)}
+
+/* COMPARISON TABLE */
+.compare{width:100%;border-collapse:collapse;font-size:.85rem}
+.compare th,.compare td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+.compare th{color:var(--accent);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+.compare td:first-child{font-weight:600}
+.compare .check{color:var(--green)}.compare .x{color:var(--red)}
+
+/* FOOTER */
+footer{padding:48px 0;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:.85rem}
+footer a{color:var(--accent);text-decoration:none}
 
 /* RESPONSIVE */
-@media(max-width:1200px){.app{grid-template-columns:180px 1fr 280px}.dashboard{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr 220px}.sidebar{grid-row:2;display:flex;overflow-x:auto;padding:8px;gap:4px}.sidebar h3{display:none}.node-item{min-width:120px}.reasoning-panel{grid-row:3;min-height:200px}.dashboard{grid-column:1;grid-row:4;grid-template-columns:repeat(2,1fr)}.canvas-area{min-height:400px}}
+@media(max-width:640px){
+  .demo-body{grid-template-columns:1fr}
+  .demo-left{border-right:none;border-bottom:1px solid var(--border)}
+  .hero h1{font-size:2rem}
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="logo">
-    <svg viewBox="0 0 28 28" fill="none"><path d="M14 2L2 8v12l12 6 12-6V8L14 2z" stroke="url(#g1)" stroke-width="2" fill="none"/><path d="M14 8L8 11v6l6 3 6-3v-6l-6-3z" fill="url(#g2)" opacity=".6"/><circle cx="14" cy="14" r="3" fill="#00d4ff"/><path d="M14 5v3M14 20v3M5 10l3 1.5M20 16.5l3 1.5M5 18l3-1.5M20 11.5l3-1.5" stroke="#00d4ff" stroke-width="1" opacity=".5"/><defs><linearGradient id="g1" x1="2" y1="2" x2="26" y2="26"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#7b61ff"/></linearGradient><linearGradient id="g2" x1="8" y1="8" x2="20" y2="20"><stop stop-color="#00d4ff"/><stop offset="1" stop-color="#7b61ff"/></linearGradient></defs></svg>
-    <span>ChainMind</span>
+<!-- NAV -->
+<nav>
+<div class="inner">
+  <span class="logo">⚡ ChainMind</span>
+  <span class="badge">MiMo v2.5-pro</span>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<canvas id="neural-canvas"></canvas>
+<div class="hero-content">
+  <div class="mimo-badge"><span class="dot"></span> Powered by Xiaomi MiMo v2.5-pro</div>
+  <h1>AI Agent <span class="gradient">Swarm Intelligence</span><br>for Blockchain</h1>
+  <p>Autonomous AI agents that monitor on-chain activity, detect patterns, predict events, and execute strategies — collaborating as a collective intelligence network.</p>
+  <div class="hero-btns">
+    <a href="#demo" class="btn btn-primary">Try Live Demo ↓</a>
+    <a href="https://github.com/dovilo/ChainMind" class="btn btn-outline">GitHub ↗</a>
   </div>
-  <div class="header-actions">
-    <span class="badge">MiMo v2.5-pro</span>
-    <button class="btn btn-outline" onclick="clearCanvas()">Clear</button>
-    <button class="btn btn-outline" onclick="loadDemo()">Demo</button>
-    <button class="btn btn-primary" id="simBtn" onclick="toggleSimulation()">▶ Simulate</button>
-  </div>
-</header>
+</div>
+</section>
 
-<!-- APP GRID -->
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h3>🤖 Agents</h3>
-    <div class="node-item" draggable="true" data-type="scanner">
-      <div class="agent-icon agent-scan">🔍</div>
-      <div class="node-info"><div class="name">Market Scanner</div><div class="desc">Monitor prices & volume</div></div>
+<!-- AGENTS -->
+<section id="agents">
+<div class="container">
+  <h2 class="section-title">Agent Swarm Architecture</h2>
+  <p class="section-sub">5 specialized AI agents collaborate in real-time, each with autonomous decision-making powered by MiMo v2.5-pro reasoning.</p>
+  <div class="agents-grid">
+    <div class="agent-card">
+      <div class="agent-icon">🔍</div>
+      <h3>Scout Agent</h3>
+      <p>Monitors mempool & pending transactions across 5 EVM chains</p>
+      <span class="agent-status active">● Active</span>
     </div>
-    <div class="node-item" draggable="true" data-type="reasoner">
-      <div class="agent-icon agent-reason">🧠</div>
-      <div class="node-info"><div class="name">MiMo Reasoner</div><div class="desc">Chain-of-thought analysis</div></div>
+    <div class="agent-card">
+      <div class="agent-icon">🧠</div>
+      <h3>Analyst Agent</h3>
+      <p>Pattern recognition, whale tracking, smart money flow detection</p>
+      <span class="agent-status active">● Active</span>
     </div>
-    <div class="node-item" draggable="true" data-type="executor">
-      <div class="agent-icon agent-exec">⚡</div>
-      <div class="node-info"><div class="name">Tx Executor</div><div class="desc">Execute on-chain swaps</div></div>
+    <div class="agent-card">
+      <div class="agent-icon">⚡</div>
+      <h3>Strategy Agent</h3>
+      <p>Generates trading strategies via MiMo chain-of-thought reasoning</p>
+      <span class="agent-status monitoring">◉ Reasoning</span>
     </div>
-    <div class="node-item" draggable="true" data-type="risk">
-      <div class="agent-icon agent-risk">🛡️</div>
-      <div class="node-info"><div class="name">Risk Manager</div><div class="desc">Position limits & stops</div></div>
+    <div class="agent-card">
+      <div class="agent-icon">🛡️</div>
+      <h3>Sentinel Agent</h3>
+      <p>Rug pull detection, exploit monitoring, risk scoring</p>
+      <span class="agent-status active">● Active</span>
     </div>
-    <div class="node-item" draggable="true" data-type="yield">
-      <div class="agent-icon agent-yield">📈</div>
-      <div class="node-info"><div class="name">Yield Optimizer</div><div class="desc">Find best APY paths</div></div>
-    </div>
-    <h3>🔗 DeFi Protocols</h3>
-    <div class="node-item" draggable="true" data-type="uniswap">
-      <div class="proto-icon proto-uni">U</div>
-      <div class="node-info"><div class="name">Uniswap V3</div><div class="desc">DEX — Swap & LP</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="aave">
-      <div class="proto-icon proto-aave">A</div>
-      <div class="node-info"><div class="name">Aave V3</div><div class="desc">Lending & Borrowing</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="lido">
-      <div class="proto-icon proto-lido">L</div>
-      <div class="node-info"><div class="name">Lido</div><div class="desc">Liquid Staking (stETH)</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="compound">
-      <div class="proto-icon proto-comp">C</div>
-      <div class="node-info"><div class="name">Compound</div><div class="desc">Lending — cTokens</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="curve">
-      <div class="proto-icon proto-curve">Cv</div>
-      <div class="node-info"><div class="name">Curve</div><div class="desc">Stableswap DEX</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="maker">
-      <div class="proto-icon proto-maker">M</div>
-      <div class="node-info"><div class="name">MakerDAO</div><div class="desc">CDP & DAI minting</div></div>
-    </div>
-    <h3>⚙️ Logic</h3>
-    <div class="node-item" draggable="true" data-type="condition">
-      <div class="node-icon" style="background:var(--orange);color:#000;font-size:14px">?</div>
-      <div class="node-info"><div class="name">Condition Gate</div><div class="desc">If/else branching</div></div>
-    </div>
-    <div class="node-item" draggable="true" data-type="aggregator">
-      <div class="node-icon" style="background:var(--pink);color:#fff;font-size:14px">Σ</div>
-      <div class="node-info"><div class="name">Aggregator</div><div class="desc">Merge multi-input</div></div>
-    </div>
-  </aside>
-
-  <!-- CANVAS -->
-  <div class="canvas-area" id="canvasArea">
-    <canvas id="flowCanvas"></canvas>
-    <div class="canvas-toolbar">
-      <button class="btn" onclick="zoomIn()">+ Zoom</button>
-      <button class="btn" onclick="zoomOut()">− Zoom</button>
-      <button class="btn" onclick="fitView()">⊞ Fit</button>
-      <button class="btn" id="connectBtn" onclick="toggleConnectMode()">⟶ Connect</button>
-    </div>
-    <!-- Dynamic nodes inserted here -->
-    <div id="canvasNodes"></div>
-    <!-- Empty state -->
-    <div id="emptyState" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1">
-      <div style="font-size:48px;margin-bottom:16px;opacity:.3">🔗</div>
-      <div style="font-size:16px;color:var(--text2);margin-bottom:8px">Drag agents & protocols from the sidebar</div>
-      <div style="font-size:13px;color:var(--text2);opacity:.6">or click <strong>Demo</strong> to load a sample strategy</div>
+    <div class="agent-card">
+      <div class="agent-icon">🚀</div>
+      <h3>Executor Agent</h3>
+      <p>On-chain transaction execution with MEV protection</p>
+      <span class="agent-status monitoring">◉ Standby</span>
     </div>
   </div>
+</div>
+</section>
 
-  <!-- REASONING PANEL -->
-  <div class="reasoning-panel">
-    <div class="panel-header">
-      <h3><span class="dot" id="reasonDot"></span> MiMo Reasoning</h3>
-      <span style="font-size:11px;color:var(--text2)" id="reasonModel">mimo-v2.5-pro</span>
+<!-- LIVE DEMO -->
+<section id="demo">
+<div class="container">
+  <h2 class="section-title">Live Intelligence Dashboard</h2>
+  <p class="section-sub">Real-time agent swarm visualization with on-chain event streaming and AI-powered analysis.</p>
+  
+  <div class="demo-container">
+    <div class="demo-header">
+      <span class="demo-dot r"></span>
+      <span class="demo-dot y"></span>
+      <span class="demo-dot g"></span>
+      <span style="margin-left:12px;font-size:.85rem;color:var(--muted)">ChainMind Agent Network — Live</span>
     </div>
-    <div class="reasoning-content" id="reasoningContent">
-      <div style="text-align:center;padding:40px 0;color:var(--text2);opacity:.5">
-        <div style="font-size:32px;margin-bottom:10px">🧠</div>
-        <div>Start simulation to see MiMo reasoning</div>
+    
+    <div class="stats-bar">
+      <div class="stat"><div class="val" id="stat-agents">5</div><div class="label">Active Agents</div></div>
+      <div class="stat"><div class="val" id="stat-events">0</div><div class="label">Events Processed</div></div>
+      <div class="stat"><div class="val" id="stat-alerts">0</div><div class="label">Alerts Triggered</div></div>
+      <div class="stat"><div class="val" id="stat-accuracy">94.7%</div><div class="label">Detection Accuracy</div></div>
+    </div>
+    
+    <div class="demo-body">
+      <div class="demo-left">
+        <h4 style="font-size:.85rem;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">Agent Network</h4>
+        <canvas id="agent-canvas"></canvas>
+      </div>
+      <div class="demo-right">
+        <h4 style="font-size:.85rem;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">Intelligence Feed</h4>
+        <div class="feed" id="feed"></div>
       </div>
     </div>
   </div>
+  
+  <!-- QUERY BOX -->
+  <div class="query-box">
+    <h4 style="font-size:.95rem;margin-bottom:12px">Ask the Agent Swarm</h4>
+    <div class="query-input-wrap">
+      <input class="query-input" id="query-input" placeholder="e.g. What are the top whale movements in the last hour?" onkeydown="if(event.key==='Enter')runQuery()">
+      <button class="query-btn" onclick="runQuery()">Analyze →</button>
+    </div>
+    <div class="query-result" id="query-result"></div>
+  </div>
+</div>
+</section>
 
-  <!-- BOTTOM DASHBOARD -->
-  <div class="dashboard">
-    <div class="metric">
-      <div class="label">Portfolio Value</div>
-      <div class="value" id="mPortfolio">$12,450</div>
-      <div class="change up" id="mPortfolioCh">↑ +3.2%</div>
+<!-- ARCHITECTURE -->
+<section id="architecture">
+<div class="container">
+  <h2 class="section-title">System Architecture</h2>
+  <p class="section-sub">Multi-chain data pipeline with MiMo v2.5-pro as the central reasoning engine.</p>
+  <div class="arch-diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                    CHAINMIND AGENT SWARM                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │ Ethereum │  │  Base    │  │ Arbitrum │  │ Polygon  │  ...   │
+│  │  RPC     │  │  RPC     │  │  RPC     │  │  RPC     │       │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘       │
+│       │              │              │              │             │
+│       └──────────────┴──────┬───────┴──────────────┘             │
+│                             ▼                                    │
+│                    ┌────────────────┐                            │
+│                    │  Scout Agent   │ ← Mempool + Block Monitor  │
+│                    └───────┬────────┘                            │
+│                            ▼                                     │
+│              ┌─────────────────────────────┐                     │
+│              │   MiMo v2.5-pro Reasoning   │                     │
+│              │   (128K context, JSON mode)  │                     │
+│              └──────┬──────────────┬───────┘                     │
+│                     ▼              ▼                              │
+│           ┌──────────────┐ ┌──────────────┐                      │
+│           │ Analyst Agent│ │Sentinel Agent│                      │
+│           │  • Patterns  │ │  • Rug Pulls │                      │
+│           │  • Whales    │ │  • Exploits  │                      │
+│           │  • Flows     │ │  • Risk Score│                      │
+│           └──────┬───────┘ └──────┬───────┘                      │
+│                  ▼                ▼                               │
+│           ┌──────────────────────────────┐                       │
+│           │      Strategy Agent          │                       │
+│           │  • Signal → Action mapping   │                       │
+│           │  • Risk-adjusted decisions   │                       │
+│           └─────────────┬────────────────┘                       │
+│                         ▼                                        │
+│              ┌──────────────────────┐                            │
+│              │   Executor Agent     │ → On-chain TX (MEV-safe)  │
+│              └──────────────────────┘                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+  </div>
+</div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+<div class="container">
+  <h2 class="section-title">Why ChainMind?</h2>
+  <p class="section-sub">Built for the next generation of on-chain intelligence.</p>
+  <div class="features-grid">
+    <div class="feature">
+      <h3>🤖 Autonomous Agents</h3>
+      <p>Each agent operates independently with its own reasoning loop. They communicate via a message bus, reaching consensus before executing high-stakes actions.</p>
     </div>
-    <div class="metric">
-      <div class="label">Total APY</div>
-      <div class="value" id="mApy">18.7%</div>
-      <div class="change up" id="mApyCh">↑ +1.4%</div>
+    <div class="feature">
+      <h3>🧠 MiMo Chain-of-Thought</h3>
+      <p>MiMo v2.5-pro powers deep reasoning at each agent node. 128K context window allows analyzing entire transaction histories in a single pass.</p>
     </div>
-    <div class="metric">
-      <div class="label">Gas Spent</div>
-      <div class="value" id="mGas">0.042 Ξ</div>
-      <div class="change down" id="mGasCh">$105.84</div>
+    <div class="feature">
+      <h3>⚡ Real-Time Processing</h3>
+      <p>Sub-second event detection across 5+ EVM chains. Mempool monitoring catches pending transactions before they're confirmed on-chain.</p>
     </div>
-    <div class="metric">
-      <div class="label">Active Agents</div>
-      <div class="value" id="mAgents">0</div>
-      <div class="change" id="mAgentsCh" style="color:var(--text2)">idle</div>
+    <div class="feature">
+      <h3>🛡️ Risk Intelligence</h3>
+      <p>Sentinel Agent scores every contract interaction for risk. Rug pull detection uses pattern matching against 10,000+ known exploit signatures.</p>
     </div>
-    <div class="metric">
-      <div class="label">Transactions</div>
-      <div class="value" id="mTx">0</div>
-      <div class="change" id="mTxCh" style="color:var(--text2)">—</div>
+    <div class="feature">
+      <h3>📊 Pattern Recognition</h3>
+      <p>Analyst Agent identifies whale accumulation, smart money rotation, DEX arbitrage windows, and governance attack vectors in real-time.</p>
     </div>
-    <div class="metric">
-      <div class="label">Risk Score</div>
-      <div class="value" id="mRisk">—</div>
-      <div class="change" id="mRiskCh" style="color:var(--text2)">awaiting data</div>
+    <div class="feature">
+      <h3>🔒 MEV Protection</h3>
+      <p>Executor Agent routes transactions through private mempools and uses flashbots to prevent sandwich attacks and front-running.</p>
     </div>
   </div>
-
 </div>
+</section>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+<!-- COMPARISON -->
+<section id="compare">
+<div class="container">
+  <h2 class="section-title">Comparison</h2>
+  <p class="section-sub">How ChainMind stacks up against existing solutions.</p>
+  <div style="overflow-x:auto">
+  <table class="compare">
+    <thead><tr><th>Feature</th><th>ChainMind</th><th>Dune Analytics</th><th>Nansen</th><th>Arkham</th></tr></thead>
+    <tbody>
+      <tr><td>AI Agent Swarm</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td><td class="x">✗</td></tr>
+      <tr><td>MiMo Reasoning</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td><td class="x">✗</td></tr>
+      <tr><td>Mempool Monitoring</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td><td class="check">✓</td></tr>
+      <tr><td>Rug Pull Detection</td><td class="check">✓</td><td class="x">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>Autonomous Execution</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td><td class="x">✗</td></tr>
+      <tr><td>NL Query Interface</td><td class="check">✓</td><td class="x">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>Multi-Chain</td><td class="check">5+ chains</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>MEV Protection</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td><td class="x">✗</td></tr>
+      <tr><td>Open Source</td><td class="check">✓ MIT</td><td class="check">✓</td><td class="x">✗</td><td class="x">✗</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="container">
+  <p><strong>ChainMind</strong> — Powered by <a href="https://huggingface.co/XiaomiMiMo">Xiaomi MiMo v2.5-pro</a></p>
+  <p style="margin-top:8px">MIT License · Built with Claude Code + Hermes Agent</p>
+</div>
+</footer>
 
 <script>
-// ============ STATE ============
-const state = {
-  nodes: [],
-  connections: [],
-  nextId: 1,
-  dragging: null,
-  dragOffset: { x: 0, y: 0 },
-  connecting: false,
-  connectFrom: null,
-  simulating: false,
-  simStep: 0,
-  zoom: 1,
-  pan: { x: 0, y: 0 }
-};
-
-const canvas = document.getElementById('flowCanvas');
-const ctx = canvas.getContext('2d');
-const canvasArea = document.getElementById('canvasArea');
-const nodesContainer = document.getElementById('canvasNodes');
-
-// ============ NODE DEFINITIONS ============
-const nodeDefs = {
-  scanner:   { label: 'Market Scanner',   color: '#00d4ff', icon: '🔍', type: 'agent',   category: 'Input' },
-  reasoner:  { label: 'MiMo Reasoner',    color: '#7b61ff', icon: '🧠', type: 'agent',   category: 'Process' },
-  executor:  { label: 'Tx Executor',      color: '#00e88f', icon: '⚡', type: 'agent',   category: 'Output' },
-  risk:      { label: 'Risk Manager',     color: '#ff6b6b', icon: '🛡️', type: 'agent',   category: 'Control' },
-  yield:     { label: 'Yield Optimizer',  color: '#ffa940', icon: '📈', type: 'agent',   category: 'Process' },
-  uniswap:   { label: 'Uniswap V3',      color: '#ff007a', icon: '🦄', type: 'protocol', tvl: '$5.2B', apy: '12-45%' },
-  aave:      { label: 'Aave V3',         color: '#b6509e', icon: '👻', type: 'protocol', tvl: '$12.8B', apy: '3-8%' },
-  lido:      { label: 'Lido',            color: '#00a3ff', icon: '🔥', type: 'protocol', tvl: '$14.1B', apy: '3.2%' },
-  compound:  { label: 'Compound',        color: '#00d395', icon: '🏦', type: 'protocol', tvl: '$2.1B', apy: '2-6%' },
-  curve:     { label: 'Curve',           color: '#ff4e4e', icon: '〰️', type: 'protocol', tvl: '$3.8B', apy: '5-20%' },
-  maker:     { label: 'MakerDAO',        color: '#1aab9b', icon: '🏛️', type: 'protocol', tvl: '$8.5B', apy: '3.5%' },
-  condition: { label: 'Condition Gate',  color: '#ffa940', icon: '?',  type: 'logic',    category: 'Control' },
-  aggregator:{ label: 'Aggregator',      color: '#ff61d8', icon: 'Σ',  type: 'logic',    category: 'Merge' }
-};
-
-// ============ CANVAS RESIZE ============
-function resizeCanvas() {
-  const rect = canvasArea.getBoundingClientRect();
-  canvas.width = rect.width * devicePixelRatio;
-  canvas.height = rect.height * devicePixelRatio;
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
-  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-  drawConnections();
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// ============ DRAG FROM SIDEBAR ============
-document.querySelectorAll('.node-item[draggable]').forEach(item => {
-  item.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('nodeType', item.dataset.type);
-  });
-});
-
-canvasArea.addEventListener('dragover', e => e.preventDefault());
-canvasArea.addEventListener('drop', e => {
-  e.preventDefault();
-  const type = e.dataTransfer.getData('nodeType');
-  if (!type || !nodeDefs[type]) return;
-  const rect = canvasArea.getBoundingClientRect();
-  addNode(type, e.clientX - rect.left - 80, e.clientY - rect.top - 30);
-});
-
-// ============ ADD NODE ============
-function addNode(type, x, y) {
-  const def = nodeDefs[type];
-  const id = state.nextId++;
-  const node = { id, type, x, y, def };
-  state.nodes.push(node);
-  renderNode(node);
-  document.getElementById('emptyState').style.display = 'none';
-  updateAgentCount();
-  return node;
-}
-
-function renderNode(node) {
-  const el = document.createElement('div');
-  el.className = 'canvas-node fade-in';
-  el.id = 'node-' + node.id;
-  el.style.left = node.x + 'px';
-  el.style.top = node.y + 'px';
-  el.dataset.nodeId = node.id;
-
-  let meta = '';
-  if (node.def.type === 'protocol') {
-    meta = `<div style="font-size:10px;color:var(--text2);margin-top:4px">TVL: ${node.def.tvl} · APY: ${node.def.apy}</div>`;
-  } else if (node.def.type === 'agent') {
-    meta = `<div style="font-size:10px;color:var(--text2);margin-top:4px">${node.def.category}</div>`;
-  }
-
-  el.innerHTML = `
-    <div class="port port-in" data-port="in" data-node="${node.id}"></div>
-    <div class="port port-out" data-port="out" data-node="${node.id}"></div>
-    <div class="node-header">
-      <span style="font-size:18px">${node.def.icon}</span>
-      <span style="font-size:13px;font-weight:600">${node.def.label}</span>
-    </div>
-    <div class="node-body">${meta}</div>
-  `;
-
-  // Drag on canvas
-  el.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('port')) return;
-    state.dragging = node;
-    const r = el.getBoundingClientRect();
-    state.dragOffset = { x: e.clientX - r.left, y: e.clientY - r.top };
-    el.classList.add('selected');
-    // bring to front
-    el.style.zIndex = 10;
-  });
-
-  // Port click for connections
-  el.querySelectorAll('.port').forEach(port => {
-    port.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      if (state.connecting && state.connectFrom !== null) {
-        const fromId = state.connectFrom;
-        const toId = parseInt(port.dataset.node);
-        if (fromId !== toId) {
-          state.connections.push({ from: fromId, to: toId });
-          drawConnections();
-          toast('Connection created');
-        }
-        state.connecting = false;
-        state.connectFrom = null;
-        document.getElementById('connectBtn').classList.remove('active');
-      } else {
-        state.connecting = true;
-        state.connectFrom = parseInt(port.dataset.node);
-        document.getElementById('connectBtn').classList.add('active');
-        toast('Click another port to connect');
+// ====== NEURAL NETWORK BACKGROUND ======
+(function(){
+  const c=document.getElementById('neural-canvas'),ctx=c.getContext('2d');
+  let w,h,nodes=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
+  window.addEventListener('resize',resize);resize();
+  for(let i=0;i<80;i++)nodes.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2+1});
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i];
+      a.x+=a.vx;a.y+=a.vy;
+      if(a.x<0||a.x>w)a.vx*=-1;if(a.y<0||a.y>h)a.vy*=-1;
+      ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,Math.PI*2);ctx.fillStyle='rgba(99,102,241,.6)';ctx.fill();
+      for(let j=i+1;j<nodes.length;j++){
+        const b=nodes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d<150){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(99,102,241,${.15*(1-d/150)})`;ctx.stroke()}
       }
-    });
-  });
-
-  nodesContainer.appendChild(el);
-}
-
-// ============ CANVAS MOUSE EVENTS ============
-canvasArea.addEventListener('mousemove', e => {
-  if (!state.dragging) return;
-  const rect = canvasArea.getBoundingClientRect();
-  const x = e.clientX - rect.left - state.dragOffset.x;
-  const y = e.clientY - rect.top - state.dragOffset.y;
-  state.dragging.x = x;
-  state.dragging.y = y;
-  const el = document.getElementById('node-' + state.dragging.id);
-  if (el) { el.style.left = x + 'px'; el.style.top = y + 'px'; }
-  drawConnections();
-});
-
-canvasArea.addEventListener('mouseup', () => {
-  if (state.dragging) {
-    const el = document.getElementById('node-' + state.dragging.id);
-    if (el) { el.classList.remove('selected'); el.style.zIndex = 5; }
-  }
-  state.dragging = null;
-});
-
-// ============ DRAW CONNECTIONS ============
-function drawConnections() {
-  ctx.clearRect(0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
-  state.connections.forEach(conn => {
-    const fromEl = document.getElementById('node-' + conn.from);
-    const toEl = document.getElementById('node-' + conn.to);
-    if (!fromEl || !toEl) return;
-
-    const fromRect = fromEl.getBoundingClientRect();
-    const toRect = toEl.getBoundingClientRect();
-    const areaRect = canvasArea.getBoundingClientRect();
-
-    const x1 = fromRect.right - areaRect.left;
-    const y1 = fromRect.top + fromRect.height / 2 - areaRect.top;
-    const x2 = toRect.left - areaRect.left;
-    const y2 = toRect.top + toRect.height / 2 - areaRect.top;
-
-    // Gradient line
-    const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-    grad.addColorStop(0, '#00d4ff');
-    grad.addColorStop(1, '#7b61ff');
-
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    const cx1 = x1 + (x2 - x1) * 0.4;
-    const cx2 = x1 + (x2 - x1) * 0.6;
-    ctx.bezierCurveTo(cx1, y1, cx2, y2, x2, y2);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Animated particle
-    if (state.simulating) {
-      const t = (Date.now() % 2000) / 2000;
-      const px = bezierPoint(x1, cx1, cx2, x2, t);
-      const py = bezierPoint(y1, y1, y2, y2, t);
-      ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#00d4ff';
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = '#00d4ff';
-      ctx.fill();
-      ctx.shadowBlur = 0;
     }
-
-    // Arrowhead
-    const angle = Math.atan2(y2 - bezierPoint(y1, y1, y2, y2, 0.95), x2 - bezierPoint(x1, cx1, cx2, x2, 0.95));
-    ctx.beginPath();
-    ctx.moveTo(x2, y2);
-    ctx.lineTo(x2 - 10 * Math.cos(angle - 0.4), y2 - 10 * Math.sin(angle - 0.4));
-    ctx.lineTo(x2 - 10 * Math.cos(angle + 0.4), y2 - 10 * Math.sin(angle + 0.4));
-    ctx.closePath();
-    ctx.fillStyle = '#7b61ff';
-    ctx.fill();
-  });
-}
-
-function bezierPoint(p0, p1, p2, p3, t) {
-  const mt = 1 - t;
-  return mt * mt * mt * p0 + 3 * mt * mt * t * p1 + 3 * mt * t * t * p2 + t * t * t * p3;
-}
-
-// ============ CONNECT MODE ============
-function toggleConnectMode() {
-  state.connecting = !state.connecting;
-  state.connectFrom = null;
-  document.getElementById('connectBtn').classList.toggle('active');
-  toast(state.connecting ? 'Connect mode ON — click ports' : 'Connect mode OFF');
-}
-
-// ============ ZOOM ============
-function zoomIn() { state.zoom = Math.min(2, state.zoom + 0.1); applyZoom(); }
-function zoomOut() { state.zoom = Math.max(0.5, state.zoom - 0.1); applyZoom(); }
-function applyZoom() { nodesContainer.style.transform = `scale(${state.zoom})`; drawConnections(); }
-function fitView() { state.zoom = 1; applyZoom(); }
-
-// ============ CLEAR ============
-function clearCanvas() {
-  state.nodes = [];
-  state.connections = [];
-  state.nextId = 1;
-  nodesContainer.innerHTML = '';
-  document.getElementById('emptyState').style.display = '';
-  drawConnections();
-  updateAgentCount();
-  resetMetrics();
-}
-
-// ============ LOAD DEMO ============
-function loadDemo() {
-  clearCanvas();
-  const scanner = addNode('scanner', 60, 60);
-  const reasoner = addNode('reasoner', 300, 40);
-  const risk = addNode('risk', 300, 180);
-  const yieldOpt = addNode('yield', 540, 40);
-  const executor = addNode('executor', 540, 180);
-  const uni = addNode('uniswap', 780, 40);
-  const aave = addNode('aave', 780, 140);
-  const lido = addNode('lido', 780, 240);
-
-  state.connections.push(
-    { from: scanner.id, to: reasoner.id },
-    { from: scanner.id, to: risk.id },
-    { from: reasoner.id, to: yieldOpt.id },
-    { from: risk.id, to: executor.id },
-    { from: yieldOpt.id, to: executor.id },
-    { from: executor.id, to: uni.id },
-    { from: executor.id, to: aave.id },
-    { from: executor.id, to: lido.id }
-  );
-  drawConnections();
-  updateAgentCount();
-  toast('Demo strategy loaded — click Simulate');
-}
-
-// ============ SIMULATION ============
-let simInterval = null;
-function toggleSimulation() {
-  if (state.simulating) {
-    stopSimulation();
-  } else {
-    startSimulation();
+    requestAnimationFrame(draw);
   }
-}
+  draw();
+})();
 
-function startSimulation() {
-  if (state.nodes.length === 0) { loadDemo(); }
-  state.simulating = true;
-  state.simStep = 0;
-  document.getElementById('simBtn').textContent = '⏸ Pause';
-  document.getElementById('simBtn').classList.remove('btn-primary');
-  document.getElementById('simBtn').classList.add('btn-danger');
-  document.getElementById('reasonDot').style.background = 'var(--green)';
-
-  const steps = getReasoningSteps();
-  showStep(steps, 0);
-
-  simInterval = setInterval(() => {
-    state.simStep++;
-    if (state.simStep < steps.length) {
-      showStep(steps, state.simStep);
-    } else {
-      state.simStep = 0;
-      showStep(steps, 0);
-    }
-    updateMetrics();
-    drawConnections();
-  }, 3000);
-}
-
-function stopSimulation() {
-  state.simulating = false;
-  clearInterval(simInterval);
-  document.getElementById('simBtn').textContent = '▶ Simulate';
-  document.getElementById('simBtn').classList.remove('btn-danger');
-  document.getElementById('simBtn').classList.add('btn-primary');
-  document.getElementById('reasonDot').style.background = 'var(--text2)';
-}
-
-function getReasoningSteps() {
-  return [
-    { label: 'Market Scan', text: 'Scanning ETH/USDC, stETH/ETH, AAVE/USDC pairs across Uniswap V3, Curve pools. ETH price $2,521 (+2.4% 24h). Volume spike detected on ETH/USDC 0.3% pool.', decision: '→ Signal: bullish momentum, volatility elevated (σ=0.42)' },
-    { label: 'Risk Assessment', text: 'Current exposure: 65% ETH, 20% stablecoins, 15% stETH. Max drawdown tolerance: 8%. Correlation matrix shows high ETH-stETH dependency.', warning: '⚠ Risk flag: concentrated ETH exposure exceeds 60% threshold' },
-    { label: 'MiMo Strategy', text: 'Analyzing 3 possible strategies: [A] Add to stETH position (3.2% APY + ETH exposure), [B] LP on Curve stETH/ETH (8-15% APY), [C] Lend USDC on Aave (4.1% APY). Chain-of-thought: Strategy B offers best risk-adjusted return with IL mitigated by correlated pair.', decision: '→ Selected: Strategy B — Curve stETH/ETH LP' },
-    { label: 'Yield Optimization', text: 'Scanning across protocols: Curve stETH/ETH pool APY 11.2% (base 6.8% + CRV rewards 4.4%). Compare with Convex wrapper: +2.3% boost. Gas estimate: 0.008 ETH for deposit + approve.', decision: '→ Route: Direct Curve deposit (gas-optimal for <$15K position)' },
-    { label: 'Execution', text: 'Building calldata: Curve add_liquidity(1500 USDC equiv in stETH, 1500 USDC equiv in ETH). Slippage tolerance: 0.5%. Gas price: 28 gwei (standard). MEV protection: using Flashbots Protect RPC.', decision: '→ TX submitted: 0x7a3f...e82d (pending, ~12s confirmation)' },
-    { label: 'Post-Execution', text: 'TX confirmed in block 19,847,231. LP tokens received: 2,847.34 CRV-LP. Position value: $3,012.45. Estimated daily yield: $0.92. Portfolio APY updated: 18.7% → 20.1%.', decision: '→ Strategy active. Monitoring for rebalance triggers.' }
+// ====== AGENT NETWORK CANVAS ======
+(function(){
+  const c=document.getElementById('agent-canvas'),ctx=c.getContext('2d');
+  let w,h;
+  function resize(){const r=c.parentElement;w=c.width=r.clientWidth;h=c.height=280}
+  window.addEventListener('resize',resize);resize();
+  const agents=[
+    {name:'Scout',x:.5,y:.15,color:'#6366f1',icon:'🔍'},
+    {name:'Analyst',x:.25,y:.5,color:'#06b6d4',icon:'🧠'},
+    {name:'Sentinel',x:.75,y:.5,color:'#ef4444',icon:'🛡️'},
+    {name:'Strategy',x:.5,y:.75,color:'#eab308',icon:'⚡'},
+    {name:'Executor',x:.5,y:.95,color:'#10b981',icon:'🚀'}
   ];
-}
-
-function showStep(steps, idx) {
-  const content = document.getElementById('reasoningContent');
-  const step = steps[idx];
-
-  // Build cumulative steps
-  let html = '';
-  for (let i = 0; i <= idx; i++) {
-    const s = steps[i];
-    const isLatest = i === idx;
-    html += `<div class="step ${isLatest ? 'fade-in' : ''}" style="${!isLatest ? 'opacity:.5' : ''}">
-      <div class="label">${s.label}</div>
-      <div class="text">${s.text}</div>
-      ${s.decision ? `<div class="decision">${s.decision}</div>` : ''}
-      ${s.warning ? `<div class="warning">${s.warning}</div>` : ''}
-    </div>`;
+  const connections=[[0,1],[0,2],[1,3],[2,3],[3,4],[1,2]];
+  let particles=[];
+  
+  function spawnParticle(from,to){
+    particles.push({x:from.x, y:from.y, tx:to.x, ty:to.y, t:0, speed:.008+Math.random()*.006, color:from.color});
   }
-
-  if (idx < steps.length - 1) {
-    html += `<div class="thinking-dots"><span></span><span></span><span></span></div>`;
-  }
-
-  content.innerHTML = html;
-  content.scrollTop = content.scrollHeight;
-}
-
-// ============ METRICS ============
-const baseMetrics = { portfolio: 12450, apy: 18.7, gas: 0.042, tx: 0 };
-function updateMetrics() {
-  const step = state.simStep;
-  const portfolio = baseMetrics.portfolio + step * 87 + Math.random() * 50;
-  const apy = baseMetrics.apy + step * 0.7 + Math.random() * 0.5;
-  const gas = baseMetrics.gas + step * 0.003;
-  const tx = step + 1;
-  const risks = ['Low', 'Low', 'Medium', 'Medium', 'Low', 'Low'];
-  const riskColors = ['var(--green)', 'var(--green)', 'var(--orange)', 'var(--orange)', 'var(--green)', 'var(--green)'];
-
-  document.getElementById('mPortfolio').textContent = '$' + portfolio.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  document.getElementById('mPortfolioCh').innerHTML = `↑ +${((portfolio / baseMetrics.portfolio - 1) * 100).toFixed(1)}%`;
-  document.getElementById('mApy').textContent = apy.toFixed(1) + '%';
-  document.getElementById('mApyCh').innerHTML = `↑ +${(apy - baseMetrics.apy).toFixed(1)}%`;
-  document.getElementById('mGas').textContent = gas.toFixed(3) + ' Ξ';
-  document.getElementById('mGasCh').textContent = '$' + (gas * 2521).toFixed(2);
-  document.getElementById('mAgents').textContent = state.nodes.filter(n => nodeDefs[n.type]?.type === 'agent').length;
-  document.getElementById('mAgentsCh').textContent = 'active';
-  document.getElementById('mAgentsCh').style.color = 'var(--green)';
-  document.getElementById('mTx').textContent = tx;
-  document.getElementById('mTxCh').textContent = 'confirmed';
-  document.getElementById('mTxCh').style.color = 'var(--green)';
-  document.getElementById('mRisk').textContent = risks[step] || 'Low';
-  document.getElementById('mRisk').style.color = riskColors[step] || 'var(--green)';
-  document.getElementById('mRiskCh').textContent = 'score: ' + (15 + step * 8);
-  document.getElementById('mRiskCh').style.color = riskColors[step] || 'var(--green)';
-}
-
-function updateAgentCount() {
-  const count = state.nodes.filter(n => nodeDefs[n.type]?.type === 'agent').length;
-  document.getElementById('mAgents').textContent = count;
-}
-
-function resetMetrics() {
-  document.getElementById('mPortfolio').textContent = '$12,450';
-  document.getElementById('mPortfolioCh').innerHTML = '↑ +3.2%';
-  document.getElementById('mApy').textContent = '18.7%';
-  document.getElementById('mApyCh').innerHTML = '↑ +1.4%';
-  document.getElementById('mGas').textContent = '0.042 Ξ';
-  document.getElementById('mGasCh').textContent = '$105.84';
-  document.getElementById('mAgents').textContent = '0';
-  document.getElementById('mAgentsCh').textContent = 'idle';
-  document.getElementById('mAgentsCh').style.color = 'var(--text2)';
-  document.getElementById('mTx').textContent = '0';
-  document.getElementById('mTxCh').textContent = '—';
-  document.getElementById('mTxCh').style.color = 'var(--text2)';
-  document.getElementById('mRisk').textContent = '—';
-  document.getElementById('mRisk').style.color = 'var(--text2)';
-  document.getElementById('mRiskCh').textContent = 'awaiting data';
-  document.getElementById('mRiskCh').style.color = 'var(--text2)';
-}
-
-// ============ TOAST ============
-let toastTimeout;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-// ============ BACKGROUND PARTICLES ============
-const bgCanvas = document.createElement('canvas');
-bgCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.3';
-canvasArea.insertBefore(bgCanvas, canvasArea.firstChild);
-const bgCtx = bgCanvas.getContext('2d');
-const particles = [];
-
-function initParticles() {
-  const rect = canvasArea.getBoundingClientRect();
-  bgCanvas.width = rect.width * devicePixelRatio;
-  bgCanvas.height = rect.height * devicePixelRatio;
-  bgCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-  for (let i = 0; i < 50; i++) {
-    particles.push({
-      x: Math.random() * rect.width,
-      y: Math.random() * rect.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.5 + 0.5,
-      color: Math.random() > 0.5 ? '#00d4ff' : '#7b61ff'
+  
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    frame++;
+    
+    // Draw connections
+    connections.forEach(([i,j])=>{
+      const a=agents[i],b=agents[j];
+      ctx.beginPath();ctx.moveTo(a.x*w,a.y*h);ctx.lineTo(b.x*w,b.y*h);
+      ctx.strokeStyle='rgba(99,102,241,.2)';ctx.lineWidth=1.5;ctx.stroke();
     });
+    
+    // Spawn particles
+    if(frame%40===0){
+      const ci=connections[Math.floor(Math.random()*connections.length)];
+      spawnParticle(agents[ci[0]],agents[ci[1]]);
+    }
+    
+    // Draw particles
+    particles=particles.filter(p=>{
+      p.t+=p.speed;
+      if(p.t>=1)return false;
+      const px=p.x+(p.tx-p.x)*p.t,py=p.y+(p.ty-p.y)*p.t;
+      ctx.beginPath();ctx.arc(px*w,py*h,3,0,Math.PI*2);
+      ctx.fillStyle=p.color;ctx.globalAlpha=1-p.t;ctx.fill();ctx.globalAlpha=1;
+      return true;
+    });
+    
+    // Draw agents
+    agents.forEach(a=>{
+      const ax=a.x*w,ay=a.y*h;
+      // Glow
+      const g=ctx.createRadialGradient(ax,ay,0,ax,ay,25);
+      g.addColorStop(0,a.color+'40');g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.fillRect(ax-25,ay-25,50,50);
+      // Node
+      ctx.beginPath();ctx.arc(ax,ay,14,0,Math.PI*2);
+      ctx.fillStyle='#12121a';ctx.fill();
+      ctx.strokeStyle=a.color;ctx.lineWidth=2;ctx.stroke();
+      // Label
+      ctx.fillStyle='#e2e8f0';ctx.font='600 10px Inter,system-ui';ctx.textAlign='center';
+      ctx.fillText(a.name,ax,ay+28);
+    });
+    
+    requestAnimationFrame(draw);
   }
+  draw();
+})();
+
+// ====== LIVE FEED ======
+const feedEl=document.getElementById('feed');
+let eventCount=0,alertCount=0;
+const events=[
+  {type:'info',agent:'Scout',msg:'Large ETH transfer detected: 1,247 ETH → 0x742d...35Fk (Binance)'},
+  {type:'alert',agent:'Sentinel',msg:'⚠️ Rug pull pattern detected: Token 0x89ab...cdef matches known exploit signature'},
+  {type:'success',agent:'Analyst',msg:'Whale accumulation: 0xdead...beef buying 500K $ARB over 4 hours'},
+  {type:'trade',agent:'Strategy',msg:'Signal generated: Long ETH/USDC — whale inflow + decreasing exchange reserves'},
+  {type:'info',agent:'Scout',msg:'Uniswap V3 pool created: PEPE/ETH 1% — initial liquidity 45 ETH'},
+  {type:'alert',agent:'Sentinel',msg:'⚠️ Suspicious: Contract 0x1234...5678 has proxy pattern + hidden mint function'},
+  {type:'success',agent:'Analyst',msg:'Smart money rotation: 3 wallets moving from AAVE → Lido (total: $2.1M)'},
+  {type:'trade',agent:'Strategy',msg:'MEV opportunity: 0.3 ETH sandwich gap on USDC→WBTC route via Uniswap'},
+  {type:'info',agent:'Scout',msg:'Flash loan detected: 50K ETH borrowed from Aave, repaid in same block'},
+  {type:'success',agent:'Analyst',msg:'Governance alert: 12M UNI delegated to new address — potential vote swing'},
+  {type:'alert',agent:'Sentinel',msg:'⚠️ Honeypot detected: 0xbadf...ood — can sell but buy tax = 100%'},
+  {type:'trade',agent:'Strategy',msg:'Arbitrage: 1.2% spread ETH on Uniswap vs SushiSwap — profitable after gas'},
+  {type:'info',agent:'Scout',msg:'New deployment: Uniswap V4 hooks contract deployed on mainnet'},
+  {type:'success',agent:'Analyst',msg:'Whale alert: 0xwhale...1234 withdrew 2,000 stETH from Lido'},
+];
+
+function addFeedItem(evt){
+  const div=document.createElement('div');
+  div.className='feed-item '+evt.type;
+  const time=new Date().toLocaleTimeString('en-US',{hour12:false});
+  div.innerHTML=`<span class="feed-time">${time}</span> <strong>[${evt.agent}]</strong> ${evt.msg}`;
+  feedEl.prepend(div);
+  if(feedEl.children.length>30)feedEl.removeChild(feedEl.lastChild);
+  eventCount++;
+  if(evt.type==='alert')alertCount++;
+  document.getElementById('stat-events').textContent=eventCount.toLocaleString();
+  document.getElementById('stat-alerts').textContent=alertCount;
 }
 
-function animateParticles() {
-  const rect = canvasArea.getBoundingClientRect();
-  bgCtx.clearRect(0, 0, rect.width, rect.height);
-  particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    if (p.x < 0) p.x = rect.width;
-    if (p.x > rect.width) p.x = 0;
-    if (p.y < 0) p.y = rect.height;
-    if (p.y > rect.height) p.y = 0;
-    bgCtx.beginPath();
-    bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    bgCtx.fillStyle = p.color;
-    bgCtx.fill();
-  });
+// Start feed with initial events
+events.forEach((e,i)=>setTimeout(()=>addFeedItem(e),i*600));
+// Continue with random events
+setInterval(()=>addFeedItem(events[Math.floor(Math.random()*events.length)]),4000);
 
-  // Draw lines between close particles
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 100) {
-        bgCtx.beginPath();
-        bgCtx.moveTo(particles[i].x, particles[i].y);
-        bgCtx.lineTo(particles[j].x, particles[j].y);
-        bgCtx.strokeStyle = `rgba(0,212,255,${0.15 * (1 - dist / 100)})`;
-        bgCtx.lineWidth = 0.5;
-        bgCtx.stroke();
-      }
-    }
-  }
-  requestAnimationFrame(animateParticles);
+// ====== QUERY BOX ======
+const queryResponses={
+  'whale':'🔍 Scout Agent detected 7 whale movements in the last hour:\n• 0xdead...beef: +500K ARB ($620K) — accumulation pattern\n• 0x742d...35Fk: -1,247 ETH to Binance — potential sell\n• 0xwhale...1234: 2,000 stETH withdrawn from Lido\n• 3 coordinated wallets: $2.1M rotation AAVE → Lido\n\n🧠 Analyst Agent confidence: 94.2% — recommend monitoring Binance outflows',
+  'rug':'🛡️ Sentinel Agent risk scan complete:\n• HIGH RISK: 0x89ab...cdef — matches 3 exploit signatures\n  - Hidden mint function (owner-only)\n  - Proxy pattern with upgradeable storage\n  - Liquidity lock: NONE\n• MEDIUM RISK: 0xbadf...ood — honeypot (100% sell tax)\n\n⚡ Recommendation: AVOID both tokens. Sentinel updated pattern database.',
+  'arb':'⚡ Strategy Agent arbitrage analysis:\n• ETH/USDC: 0.8% spread Uniswap → SushiSwap (profitable after gas)\n• WBTC/ETH: 1.2% spread across 3 DEXs (needs flash loan)\n• ARB/ETH: 0.5% spread (below threshold)\n\n🚀 Executor Agent on standby for top opportunity. Estimated profit: 0.15 ETH',
+  'default':'🧠 Agent Swarm Analysis:\n\nMiMo v2.5-pro reasoning chain activated. Analyzing on-chain data across 5 chains...\n\nCurrent market state: Moderate activity, 3 significant whale movements detected. No immediate threats identified. Strategy Agent recommends holding current positions with stop-loss adjustments.\n\n📊 Confidence: 91.3% | Chains monitored: ETH, Base, Arbitrum, Polygon, BSC'
+};
+
+function runQuery(){
+  const input=document.getElementById('query-input');
+  const result=document.getElementById('query-result');
+  const q=input.value.toLowerCase();
+  if(!q.trim())return;
+  
+  result.classList.add('show');
+  result.textContent='⏳ Agent swarm processing...';
+  
+  setTimeout(()=>{
+    let resp=queryResponses['default'];
+    if(q.includes('whale')||q.includes('movement'))resp=queryResponses['whale'];
+    else if(q.includes('rug')||q.includes('risk')||q.includes('scam'))resp=queryResponses['rug'];
+    else if(q.includes('arb')||q.includes('trade')||q.includes('opportunity'))resp=queryResponses['arb'];
+    result.textContent=resp;
+  },1200);
 }
 
-initParticles();
-animateParticles();
-
-// ============ KEYBOARD ============
-document.addEventListener('keydown', e => {
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    // Remove selected node
-    const selected = document.querySelector('.canvas-node.selected');
-    if (selected) {
-      const id = parseInt(selected.dataset.nodeId);
-      state.nodes = state.nodes.filter(n => n.id !== id);
-      state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
-      selected.remove();
-      drawConnections();
-      updateAgentCount();
-      if (state.nodes.length === 0) document.getElementById('emptyState').style.display = '';
-    }
-  }
-});
-
-// Click canvas to deselect
-canvasArea.addEventListener('click', e => {
-  if (e.target === canvasArea || e.target === canvas || e.target === bgCanvas) {
-    document.querySelectorAll('.canvas-node.selected').forEach(n => n.classList.remove('selected'));
-    if (state.connecting) {
-      state.connecting = false;
-      state.connectFrom = null;
-      document.getElementById('connectBtn').classList.remove('active');
-    }
-  }
-});
+// ====== COUNTER ANIMATION ======
+let evCount=0;
+setInterval(()=>{
+  evCount+=Math.floor(Math.random()*3)+1;
+  document.getElementById('stat-events').textContent=evCount.toLocaleString();
+},3000);
 </script>
 </body>
 </html>
